@@ -6,16 +6,15 @@ const App = () => {
     { role: 'assistant', content: 'Bună, cu ce te pot ajuta?' },
   ]);
   const [loading, setLoading] = useState(false);
-  const chatBodyRef = useRef(null); // Ref pentru corpul chat-ului
+  const chatBodyRef = useRef(null);
 
-  // Funcția pentru a derula automat la ultimul mesaj
+  // Derulare automată la ultimul mesaj
   const scrollToBottom = () => {
     if (chatBodyRef.current) {
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
   };
 
-  // Derulăm automat când se adaugă un mesaj nou
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -56,8 +55,8 @@ const App = () => {
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
-      event.preventDefault(); // Previne comportamentul implicit al Enter
-      handleSend(); // Trimite mesajul
+      event.preventDefault();
+      handleSend();
     }
   };
 
@@ -65,7 +64,7 @@ const App = () => {
     <div style={styles.chatWrapper}>
       {/* Chat Header */}
       <div style={styles.chatHeader}>
-        <span style={styles.chatTitle}>Assistant</span>
+        <span style={styles.chatTitle}>Asistent Bio</span>
       </div>
 
       {/* Chat Body */}
@@ -78,7 +77,9 @@ const App = () => {
               ...(msg.role === 'user' ? styles.userMessage : styles.assistantMessage),
             }}
           >
-            {msg.content}
+            {msg.content.split('\n').map((line, i) => (
+              <p key={i}>{line}</p>
+            ))}
           </div>
         ))}
         {loading && <div style={styles.loading}>Typing...</div>}
@@ -90,12 +91,12 @@ const App = () => {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown} // Adăugăm handler-ul pentru Enter
+          onKeyDown={handleKeyDown}
           placeholder="Type a message"
           style={styles.chatInput}
         />
-        <button onClick={handleSend} style={styles.sendButton}>
-          Send
+        <button onClick={handleSend} style={styles.sendButton} disabled={loading}>
+          {loading ? 'Sending...' : 'Send'}
         </button>
       </div>
     </div>
@@ -126,13 +127,10 @@ const styles = {
     borderTopLeftRadius: '8px',
     borderTopRightRadius: '8px',
   },
-  chatTitle: {
-    fontSize: '16px',
-  },
   chatBody: {
     flex: 1,
     padding: '10px',
-    overflowY: 'auto', // Adăugăm scroll vertical
+    overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
     gap: '10px',

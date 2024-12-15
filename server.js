@@ -15,7 +15,7 @@ app.use(express.json());
 
 // Configurare OpenAI
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Cheia API din fișierul .env
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 // Endpoint pentru trimiterea cererilor către OpenAI
@@ -27,27 +27,19 @@ app.post('/api/chat', async (req, res) => {
   }
 
   try {
-    const userMessage = messages[messages.length - 1]?.content.toLowerCase();
-
-    // Logică personalizată pentru răspunsuri speciale
-    if (userMessage.includes('hello')) {
-      return res.json({ message: 'Bună, cum pot să te ajut azi?' });
-    }
-    if (userMessage.includes('ajutor')) {
-      return res.json({ message: 'Sigur, te pot ajuta cu orice legat de sănătate și bio' });
-    }
-
     const systemMessage = {
       role: 'system',
-      content: 'Ești un chatbot care oferă răspunsuri prietenoase despre îngrijire fără chimicale, produse bio și despre cum să trăiești sănătos.',
+      content: 'Ești un chatbot specializat pe produse bio și sănătate. Răspunde clar și concis la întrebările utilizatorilor.',
     };
 
+    // Generare răspuns cu OpenAI
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [systemMessage, ...messages],
     });
 
-    res.json({ message: response.choices[0].message.content });
+    const assistantMessage = response.choices[0].message.content;
+    res.json({ message: assistantMessage });
   } catch (error) {
     console.error('Error with OpenAI API:', error.message);
     res.status(500).json({ error: 'Internal server error while communicating with OpenAI.' });
