@@ -27,9 +27,24 @@ app.post('/api/chat', async (req, res) => {
   }
 
   try {
+    const userMessage = messages[messages.length - 1]?.content.toLowerCase();
+
+    // Logică personalizată pentru răspunsuri speciale
+    if (userMessage.includes('hello')) {
+      return res.json({ message: 'Bună, cum pot să te ajut azi?' });
+    }
+    if (userMessage.includes('ajutor')) {
+      return res.json({ message: 'Sigur, te pot ajuta cu orice legat de sănătate și bio' });
+    }
+
+    const systemMessage = {
+      role: 'system',
+      content: 'Ești un chatbot care oferă răspunsuri prietenoase despre îngrijire fără chimicale, produse bio și despre cum să trăiești sănătos.',
+    };
+
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
-      messages,
+      messages: [systemMessage, ...messages],
     });
 
     res.json({ message: response.choices[0].message.content });
